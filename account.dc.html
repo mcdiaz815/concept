@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
+a{color:#7fb8ff;text-decoration:none}
+a:hover{color:#a9ccff}
+input::placeholder{color:#5c6676}
+</style>
+</helmet>
+
+<div data-screen-label="ЛК 3dgen" style="min-height:100vh;display:flex;flex-direction:column">
+
+<!-- HEADER -->
+<div style="display:flex;justify-content:space-between;align-items:center;padding:20px 5vw">
+  <a href="home.dc.html" style="font:700 16px 'Orbitron',sans-serif;color:#e8edf4">3DGEN<span style="color:#7fb8ff">.</span></a>
+  <div style="display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:5px;border-radius:100px">
+    <a href="home.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Главная</a>
+    <a href="home.dc.html#sec-price" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Тарифы</a>
+    <a href="catalog.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Каталог</a>
+  </div>
+  <a href="generate.dc.html" style="font:600 13px 'Manrope',sans-serif;background:#7fb8ff;color:#0a0d12;padding:11px 22px;border-radius:100px;cursor:pointer" style-hover="background:#a9ccff">+ Новая генерация</a>
+</div>
+
+<!-- ЛЕНТА-РАЗДЕЛИТЕЛЬ -->
+<div style="padding:0 5vw">
+  <div style="display:flex;justify-content:space-between;font:400 12px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em;padding:18px 0;border-bottom:1px solid rgba(232,237,244,.14)">
+    <span>ЛИЧНЫЙ КАБИНЕТ</span><span>{{ ribbonLabel }}</span><span>ЛИЧНЫЙ КАБИНЕТ</span>
+  </div>
+</div>
+
+<!-- BODY -->
+<div style="flex:1;display:grid;grid-template-columns:230px 1fr;gap:5vw;padding:40px 5vw 80px;box-sizing:border-box;align-items:start">
+
+  <!-- SIDEBAR -->
+  <div style="position:sticky;top:32px;display:flex;flex-direction:column;gap:4px">
+    <div onClick="{{ toOverview }}" style="{{ navOverviewStyle }}" style-hover="background:rgba(255,255,255,.10)">Обзор</div>
+    <div onClick="{{ toModels }}" style="{{ navModelsStyle }}" style-hover="background:rgba(255,255,255,.10)">Мои модели</div>
+    <div onClick="{{ toPayments }}" style="{{ navPaymentsStyle }}" style-hover="background:rgba(255,255,255,.10)">История платежей</div>
+    <div onClick="{{ toRequests }}" style="{{ navRequestsStyle }}" style-hover="background:rgba(255,255,255,.10)">История запросов</div>
+    <div onClick="{{ toPassword }}" style="{{ navPasswordStyle }}" style-hover="background:rgba(255,255,255,.10)">Смена пароля</div>
+    <div style="height:1px;background:rgba(232,237,244,.12);margin:14px 4px"></div>
+    <a href="register.dc.html" style="display:flex;align-items:center;gap:12px;font:600 13px 'Manrope',sans-serif;color:#8a94a6;padding:11px 16px;border-radius:10px" style-hover="color:#e8edf4">
+Выйти
+    </a>
+  </div>
+
+  <!-- ===== ОБЗОР ===== -->
+  <sc-if value="{{ isOverview }}" hint-placeholder-val="{{ true }}">
+  <div data-screen-label="ЛК — Обзор" style="max-width:860px;display:flex;flex-direction:column;gap:40px">
+
+    <!-- Пользователь -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px">
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1a2436,#10161f);border:1px solid rgba(127,184,255,.35);display:grid;place-items:center;font:700 20px 'Orbitron',sans-serif;color:#7fb8ff">T</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div style="font:700 22px 'Manrope',sans-serif;color:#e8edf4">Test test</div>
+          <div style="font:400 13px 'JetBrains Mono',monospace;color:#8a94a6">pompint5@gmail.com</div>
+        </div>
+      </div>
+      <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">АККАУНТ · С ИЮЛЯ 2026</div>
+    </div>
+
+    <!-- Баланс + статистика -->
+    <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px">
+      <div style="position:relative;background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:28px;overflow:hidden">
+        <div style="position:absolute;right:-40px;top:-40px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(127,184,255,.16),transparent 70%)"></div>
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">БАЛАНС</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:14px">
+          <span style="font:700 40px 'Orbitron',sans-serif;color:#7fb8ff">{{ balanceText }}</span>
+          <span style="font:600 15px 'Manrope',sans-serif;color:#8a94a6">кредита</span>
+        </div>
+        <div style="font:500 12px 'Manrope',sans-serif;color:#5c6676;margin-top:10px">*1 кредит = 1 000 ₽</div>
+      </div>
+      <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:28px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">МОДЕЛЕЙ СОЗДАНО</div>
+        <div style="font:700 40px 'Orbitron',sans-serif;color:#e8edf4;margin-top:14px">2</div>
+        <div onClick="{{ toModels }}" style="font:600 12px 'Manrope',sans-serif;color:#7fb8ff;margin-top:10px;cursor:pointer" style-hover="color:#a9ccff">Смотреть все →</div>
+      </div>
+    </div>
+
+    <!-- Пополнение -->
+    <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:18px">
+      <div style="font:700 16px 'Manrope',sans-serif;color:#e8edf4">Пополнить баланс</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <input value="{{ topupValue }}" onChange="{{ onTopupInput }}" placeholder="Введите сумму" inputMode="numeric" style="width:180px;background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+        <div onClick="{{ doTopup }}" style="font:600 13px 'Manrope',sans-serif;background:#7fb8ff;color:#0a0d12;padding:13px 24px;border-radius:100px;cursor:pointer;user-select:none" style-hover="background:#a9ccff">+ Пополнить баланс</div>
+        <div style="{{ toastStyle }}">{{ toastText }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">Быстрое пополнение:</span>
+        <sc-for list="{{ quickAmounts }}" as="qa" hint-placeholder-count="4">
+          <div onClick="{{ qa.add }}" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;border:1px solid rgba(232,237,244,.18);padding:7px 16px;border-radius:100px;cursor:pointer;user-select:none" style-hover="border-color:#7fb8ff;color:#7fb8ff">+{{ qa.value }}</div>
+        </sc-for>
+      </div>
+    </div>
+
+    <!-- Данные профиля -->
+    <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:20px">
+      <div style="font:700 16px 'Manrope',sans-serif;color:#e8edf4">Данные профиля</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ИМЯ</div>
+          <input defaultValue="Test" style="background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">EMAIL</div>
+          <input defaultValue="test@gmail.com" style="background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ТЕЛЕФОН</div>
+          <input defaultValue="+880 5553 535" style="background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+        </div>
+      </div>
+      <div style="display:flex;gap:12px">
+        <div style="font:600 13px 'Manrope',sans-serif;background:#e8edf4;color:#0a0d12;padding:12px 24px;border-radius:100px;cursor:pointer" style-hover="background:#ffffff">Сохранить</div>
+        <div style="font:600 13px 'Manrope',sans-serif;color:#8a94a6;padding:12px 24px;border-radius:100px;cursor:pointer;border:1px solid rgba(232,237,244,.14)" style-hover="color:#e8edf4">Отмена</div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== МОИ МОДЕЛИ ===== -->
+  <sc-if value="{{ isModels }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="ЛК — Мои модели" style="display:flex;flex-direction:column;gap:28px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="font:800 34px 'Unbounded',sans-serif;line-height:1.05">Мои модели</div>
+      <input value="{{ searchValue }}" onChange="{{ onSearch }}" placeholder="Поиск моделей…" style="width:240px;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:100px;padding:12px 20px;font:500 13px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:5px;border-radius:100px">
+        <sc-for list="{{ filterTabs }}" as="tab" hint-placeholder-count="3">
+          <div onClick="{{ tab.select }}" style="{{ tab.style }}">{{ tab.label }}</div>
+        </sc-for>
+      </div>
+      <div onClick="{{ toggleSort }}" style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676;cursor:pointer;user-select:none" style-hover="color:#8a94a6">СОРТИРОВКА: <span style="color:#e8edf4">{{ sortLabel }}</span> ↕</div>
+    </div>
+
+    <div style="{{ gridStyle }}">
+      <sc-for list="{{ models }}" as="m" hint-placeholder-count="6">
+        <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .25s" style-hover="border-color:rgba(127,184,255,.45)">
+          <div style="position:relative;aspect-ratio:16/10;background:#0d1219">
+            <div style="{{ m.thumbStyle }}"></div>
+            <div style="{{ m.statusStyle }}">{{ m.statusLabel }}</div>
+            <div onClick="{{ m.toggleFav }}" title="Избранное" style="{{ m.favStyle }}">★</div>
+          </div>
+          <div style="padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+              <div style="font:700 15px 'Manrope',sans-serif;color:#e8edf4">{{ m.name }}</div>
+              <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676">{{ m.date }}</div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <sc-for list="{{ m.formats }}" as="f" hint-placeholder-count="5">
+                <div onClick="{{ f.download }}" title="{{ f.title }}" style="font:600 11px 'JetBrains Mono',monospace;color:#8a94a6;border:1px solid rgba(232,237,244,.16);padding:5px 12px;border-radius:100px;cursor:pointer;user-select:none;transition:all .2s" style-hover="color:#0a0d12;background:#7fb8ff;border-color:#7fb8ff">{{ f.ext }}</div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:60px 0;text-align:center;font:500 14px 'Manrope',sans-serif;color:#5c6676">Ничего не найдено — измените запрос или фильтр</div>
+    </sc-if>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">Нажмите на формат под моделью, чтобы скачать её в этом формате</div>
+      <div style="display:flex;gap:6px">
+        <div style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(232,237,244,.16);display:grid;place-items:center;font:600 13px 'Manrope',sans-serif;color:#8a94a6;cursor:pointer" style-hover="border-color:#7fb8ff;color:#7fb8ff">‹</div>
+        <div style="width:34px;height:34px;border-radius:50%;background:#7fb8ff;display:grid;place-items:center;font:600 13px 'Manrope',sans-serif;color:#0a0d12">1</div>
+        <div style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(232,237,244,.16);display:grid;place-items:center;font:600 13px 'Manrope',sans-serif;color:#8a94a6;cursor:pointer" style-hover="border-color:#7fb8ff;color:#7fb8ff">2</div>
+        <div style="width:34px;height:34px;border-radius:50%;border:1px solid rgba(232,237,244,.16);display:grid;place-items:center;font:600 13px 'Manrope',sans-serif;color:#8a94a6;cursor:pointer" style-hover="border-color:#7fb8ff;color:#7fb8ff">›</div>
+      </div>
+    </div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== ИСТОРИЯ ПЛАТЕЖЕЙ ===== -->
+  <sc-if value="{{ isPayments }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="ЛК — История платежей" style="max-width:960px;display:flex;flex-direction:column;gap:32px">
+
+    <div style="font:800 34px 'Unbounded',sans-serif;line-height:1.05">История платежей</div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="position:relative;background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px;overflow:hidden">
+        <div style="position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(127,184,255,.14),transparent 70%)"></div>
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">ВСЕГО ПОТРАЧЕНО</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#7fb8ff;margin-top:14px">650 000 ₽</div>
+      </div>
+      <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">ПЛАТЕЖЕЙ ВСЕГО</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#e8edf4;margin-top:14px">4</div>
+      </div>
+      <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">ПОСЛЕДНИЙ ПЛАТЁЖ</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#e8edf4;margin-top:14px">01.07.26</div>
+      </div>
+    </div>
+
+    <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;gap:16px;padding:16px 26px;border-bottom:1px solid rgba(232,237,244,.10);font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">
+        <span>ДАТА</span><span>ТАРИФ</span><span>СУММА</span><span>СТАТУС</span>
+      </div>
+      <sc-for list="{{ payments }}" as="p" hint-placeholder-count="4">
+        <div style="display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;gap:16px;align-items:center;padding:18px 26px;border-bottom:1px solid rgba(232,237,244,.06)" style-hover="background:rgba(255,255,255,.03)">
+          <span style="font:400 13px 'JetBrains Mono',monospace;color:#8a94a6">{{ p.date }}</span>
+          <span style="font:600 14px 'Manrope',sans-serif;color:#e8edf4">{{ p.plan }}</span>
+          <span style="font:600 14px 'Manrope',sans-serif;color:#e8edf4">{{ p.amount }}</span>
+          <span><span style="{{ p.pillStyle }}">{{ p.statusLabel }}</span></span>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">Чек за каждый платёж приходит на email аккаунта</div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== ИСТОРИЯ ЗАПРОСОВ ===== -->
+  <sc-if value="{{ isRequests }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="ЛК — История запросов" style="max-width:960px;display:flex;flex-direction:column;gap:32px">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+      <div style="font:800 34px 'Unbounded',sans-serif;line-height:1.05">История запросов</div>
+      <input value="{{ reqSearchValue }}" onChange="{{ onReqSearch }}" placeholder="Поиск по запросам…" style="width:240px;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:100px;padding:12px 20px;font:500 13px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="position:relative;background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px;overflow:hidden">
+        <div style="position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(127,184,255,.14),transparent 70%)"></div>
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">ЗАПРОСОВ ВСЕГО</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#7fb8ff;margin-top:14px">6</div>
+      </div>
+      <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">КРЕДИТОВ ПОТРАЧЕНО</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#e8edf4;margin-top:14px">58</div>
+      </div>
+      <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:26px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">СРЕДНЕЕ ВРЕМЯ</div>
+        <div style="font:700 32px 'Orbitron',sans-serif;color:#e8edf4;margin-top:14px">27 сек</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:5px;border-radius:100px;align-self:flex-start">
+      <sc-for list="{{ reqTabs }}" as="rt" hint-placeholder-count="4">
+        <div onClick="{{ rt.select }}" style="{{ rt.style }}">{{ rt.label }}</div>
+      </sc-for>
+    </div>
+
+    <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:110px 1fr 120px 110px 130px;gap:16px;padding:16px 26px;border-bottom:1px solid rgba(232,237,244,.10);font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">
+        <span>ДАТА</span><span>ЗАПРОС</span><span>КРЕДИТЫ</span><span>ВРЕМЯ</span><span>СТАТУС</span>
+      </div>
+      <sc-for list="{{ requests }}" as="r" hint-placeholder-count="6">
+        <div style="display:grid;grid-template-columns:110px 1fr 120px 110px 130px;gap:16px;align-items:center;padding:18px 26px;border-bottom:1px solid rgba(232,237,244,.06)" style-hover="background:rgba(255,255,255,.03)">
+          <span style="font:400 13px 'JetBrains Mono',monospace;color:#8a94a6">{{ r.date }}</span>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <span style="font:600 14px 'Manrope',sans-serif;color:#e8edf4">{{ r.prompt }}</span>
+            <span style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676">{{ r.model }}</span>
+          </div>
+          <span style="font:600 13px 'Manrope',sans-serif;color:#e8edf4">{{ r.credits }}</span>
+          <span style="font:400 13px 'JetBrains Mono',monospace;color:#8a94a6">{{ r.time }}</span>
+          <span><span style="{{ r.pillStyle }}">{{ r.statusLabel }}</span></span>
+        </div>
+      </sc-for>
+      <sc-if value="{{ reqEmpty }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:48px 26px;text-align:center;font:500 14px 'Manrope',sans-serif;color:#5c6676">Ничего не найдено — измените запрос или фильтр</div>
+      </sc-if>
+    </div>
+
+    <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">Готовые модели доступны в разделе «Мои модели»</div>
+
+  </div>
+  </sc-if>
+
+  <!-- ===== СМЕНА ПАРОЛЯ ===== -->
+  <sc-if value="{{ isPassword }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="ЛК — Смена пароля" style="max-width:560px;display:flex;flex-direction:column;gap:32px">
+
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="font:800 34px 'Unbounded',sans-serif;line-height:1.05">Смена пароля</div>
+      <div style="font:400 14px/1.6 'Manrope',sans-serif;color:#8a94a6;text-wrap:pretty">После смены пароля все остальные сессии будут завершены — потребуется войти заново.</div>
+    </div>
+
+    <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:14px;padding:28px;display:flex;flex-direction:column;gap:22px">
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ТЕКУЩИЙ ПАРОЛЬ</div>
+        <div style="position:relative">
+          <input value="{{ pwCurValue }}" onChange="{{ onPwCur }}" type="{{ pwInputType }}" placeholder="Введите текущий пароль" style="box-sizing:border-box;width:100%;background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 48px 13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+          <div onClick="{{ togglePwShow }}" title="Показать/скрыть" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:8px;display:grid;place-items:center;cursor:pointer;font:400 13px 'JetBrains Mono',monospace;color:#5c6676;user-select:none" style-hover="color:#7fb8ff">{{ pwShowIcon }}</div>
+        </div>
+        <a href="register.dc.html" style="font:500 12px 'Manrope',sans-serif;align-self:flex-start">Забыли пароль?</a>
+      </div>
+
+      <div style="height:1px;background:rgba(232,237,244,.10)"></div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">НОВЫЙ ПАРОЛЬ</div>
+        <input value="{{ pwNewValue }}" onChange="{{ onPwNew }}" type="{{ pwInputType }}" placeholder="Минимум 8 символов" style="box-sizing:border-box;width:100%;background:#0a0d12;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:13px 16px;font:500 14px 'Manrope',sans-serif;color:#e8edf4;outline:none" style-focus="border-color:#7fb8ff">
+        <!-- сила пароля -->
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <div style="flex:1;display:flex;gap:4px">
+            <div style="{{ pwSeg1Style }}"></div>
+            <div style="{{ pwSeg2Style }}"></div>
+            <div style="{{ pwSeg3Style }}"></div>
+          </div>
+          <span style="{{ pwStrengthTextStyle }}">{{ pwStrengthLabel }}</span>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ПОВТОРИТЕ НОВЫЙ ПАРОЛЬ</div>
+        <input value="{{ pwRepValue }}" onChange="{{ onPwRep }}" type="{{ pwInputType }}" placeholder="Ещё раз новый пароль" style="{{ pwRepInputStyle }}" style-focus="border-color:#7fb8ff">
+        <span style="{{ pwMatchStyle }}">{{ pwMatchText }}</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <div onClick="{{ doChangePassword }}" style="{{ pwBtnStyle }}">Сменить пароль</div>
+        <span style="{{ pwToastStyle }}">{{ pwToastText }}</span>
+      </div>
+
+    </div>
+
+    <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676;line-height:1.8">Пароль должен содержать минимум 8 символов.<br>Рекомендуем добавить цифры и заглавные буквы.</div>
+
+  </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;defaultView&quot;: { &quot;editor&quot;: &quot;enum&quot;, &quot;options&quot;: [&quot;overview&quot;, &quot;models&quot;, &quot;payments&quot;, &quot;requests&quot;, &quot;password&quot;], &quot;default&quot;: &quot;overview&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;ЛК&quot; },
+  &quot;gridColumns&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 2, &quot;max&quot;: 4, &quot;step&quot;: 1, &quot;default&quot;: 3, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;ЛК&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    view: null, balance: 4, topup: '', toast: '',
+    search: '', filter: 'all', sortNew: true,
+    favs: { 1: true }, // id -> fav
+    reqSearch: '', reqFilter: 'all',
+    pwCur: '', pwNew: '', pwRep: '', pwShow: false, pwToast: '', pwToastOk: true,
+  };
+
+  componentDidMount() {
+    try {
+      const b = localStorage.getItem('3dgen_balance');
+      if (b !== null) this.setState({ balance: parseFloat(b) });
+    } catch (e) {}
+  }
+
+  navStyle(active) {
+    return {
+      display: 'flex', alignItems: 'center', gap: 12,
+      font: (active ? '600' : '500') + " 13px 'Manrope',sans-serif",
+      color: active ? '#e8edf4' : '#8a94a6',
+      background: active ? 'rgba(127,184,255,.12)' : 'transparent',
+      border: active ? '1px solid rgba(127,184,255,.3)' : '1px solid transparent',
+      padding: '10px 15px', borderRadius: 10, cursor: 'pointer', userSelect: 'none',
+    };
+  }
+  dotStyle(active) {
+    return { width: 7, height: 7, borderRadius: '50%', flex: 'none', background: active ? '#7fb8ff' : '#5c6676' };
+  }
+
+  baseModels() {
+    return [
+      { id: 1, name: 'Mountain Mascot', img: 'assets/hero.jpg', date: '01.07.26', status: 'ready' },
+      { id: 2, name: 'Cute Ghost',      img: 'assets/gal1.jpg', date: '30.06.26', status: 'ready' },
+      { id: 3, name: 'Zombie Runner',   img: 'assets/x_f.jpg',  date: '28.06.26', status: 'ready' },
+      { id: 4, name: 'Rusty Robot',     img: 'assets/y_r1.jpg', date: '25.06.26', status: 'progress' },
+      { id: 5, name: 'Android Bot',     img: 'assets/y_r2.jpg', date: '22.06.26', status: 'ready' },
+      { id: 6, name: 'Pebble Stack',    img: 'assets/x_b.jpg',  date: '20.06.26', status: 'ready' },
+    ];
+  }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+
+  renderVals() {
+    const view = this.state.view ?? (this.props.defaultView ?? 'overview');
+    const isOverview = view === 'overview';
+    const isModels = view === 'models';
+    const isPayments = view === 'payments';
+    const isRequests = view === 'requests';
+    const isPassword = view === 'password';
+
+    // ---- история запросов ----
+    const baseRequests = [
+      { date: '01.07.26', prompt: 'Горный маскот-йети с посохом', model: 'Mountain Mascot · glb, fbx', credits: 12, time: '31 сек', status: 'ready' },
+      { date: '30.06.26', prompt: 'Милое привидение-ночник', model: 'Cute Ghost · glb, obj', credits: 8, time: '24 сек', status: 'ready' },
+      { date: '28.06.26', prompt: 'Зомби-бегун в рваной куртке', model: 'Zombie Runner · glb, fbx, usdz', credits: 14, time: '38 сек', status: 'ready' },
+      { date: '25.06.26', prompt: 'Ржавый робот-помощник с антенной', model: 'Rusty Robot · генерация', credits: 10, time: '—', status: 'progress' },
+      { date: '22.06.26', prompt: 'Андроид с круглой головой', model: 'Android Bot · glb', credits: 9, time: '22 сек', status: 'ready' },
+      { date: '20.06.26', prompt: 'Дракон на башне из обсидиана', model: 'Запрос отклонён · кредиты возвращены', credits: 0, time: '—', status: 'error' },
+    ];
+    const rq = this.state.reqSearch.trim().toLowerCase();
+    const requests = baseRequests.filter(r => {
+      if (rq && !(r.prompt.toLowerCase().includes(rq) || r.model.toLowerCase().includes(rq))) return false;
+      if (this.state.reqFilter !== 'all' && r.status !== this.state.reqFilter) return false;
+      return true;
+    }).map(r => {
+      const map = {
+        ready:    { label: 'Готово',     bg: 'rgba(127,184,255,.15)', color: '#7fb8ff', border: '1px solid rgba(127,184,255,.35)' },
+        progress: { label: 'В процессе', bg: 'rgba(232,237,244,.08)', color: '#e8edf4', border: '1px solid rgba(232,237,244,.25)' },
+        error:    { label: 'Ошибка',     bg: 'rgba(255,120,120,.12)', color: '#ff9a9a', border: '1px solid rgba(255,120,120,.3)' },
+      }[r.status];
+      return {
+        ...r,
+        credits: r.credits ? String(r.credits) : '—',
+        statusLabel: map.label,
+        pillStyle: {
+          display: 'inline-block', padding: '5px 14px', borderRadius: 100,
+          font: "600 11px 'Manrope',sans-serif",
+          background: map.bg, color: map.color, border: map.border,
+        },
+      };
+    });
+    const reqTabs = [
+      { key: 'all', label: 'Все' },
+      { key: 'ready', label: 'Готово' },
+      { key: 'progress', label: 'В процессе' },
+      { key: 'error', label: 'Ошибки' },
+    ].map(t => ({
+      ...t,
+      select: () => this.setState({ reqFilter: t.key }),
+      style: {
+        font: "600 12px 'Manrope',sans-serif", padding: '8px 16px', borderRadius: 100,
+        cursor: 'pointer', userSelect: 'none',
+        background: this.state.reqFilter === t.key ? '#7fb8ff' : 'transparent',
+        color: this.state.reqFilter === t.key ? '#0a0d12' : '#e8edf4',
+      },
+    }));
+
+    // ---- смена пароля ----
+    const pwNew = this.state.pwNew;
+    let strength = 0;
+    if (pwNew.length >= 8) strength = 1;
+    if (pwNew.length >= 8 && /\d/.test(pwNew)) strength = 2;
+    if (pwNew.length >= 10 && /\d/.test(pwNew) && /[A-ZА-Я]/.test(pwNew)) strength = 3;
+    const strengthColors = ['rgba(232,237,244,.12)', '#ff9a9a', '#7fb8ff', '#8fe3b0'];
+    const strengthLabels = ['', 'Слабый', 'Средний', 'Надёжный'];
+    const seg = i => ({
+      height: 4, flex: 1, borderRadius: 100, transition: 'background .3s',
+      background: strength >= i ? strengthColors[strength] : 'rgba(232,237,244,.12)',
+    });
+    const repFilled = this.state.pwRep.length > 0;
+    const match = repFilled && this.state.pwRep === pwNew;
+    const mismatch = repFilled && !match;
+    const canSubmit = this.state.pwCur.length > 0 && strength >= 1 && match;
+
+    const payments = [
+      { date: '01.07.26', plan: 'Advanced Pack', amount: '100 000 ₽', ok: true },
+      { date: '15.06.26', plan: 'Standard Pack', amount: '50 000 ₽',  ok: true },
+      { date: '02.06.26', plan: 'Pro Pack',      amount: '500 000 ₽', ok: true },
+      { date: '20.05.26', plan: 'Standard Pack', amount: '50 000 ₽',  ok: false },
+    ].map(p => ({
+      ...p,
+      statusLabel: p.ok ? 'Оплачено' : 'Ошибка',
+      pillStyle: {
+        display: 'inline-block', padding: '5px 14px', borderRadius: 100,
+        font: "600 11px 'Manrope',sans-serif",
+        background: p.ok ? 'rgba(127,184,255,.15)' : 'rgba(255,120,120,.12)',
+        color: p.ok ? '#7fb8ff' : '#ff9a9a',
+        border: p.ok ? '1px solid rgba(127,184,255,.35)' : '1px solid rgba(255,120,120,.3)',
+      },
+    }));
+
+    // filters
+    const q = this.state.search.trim().toLowerCase();
+    let models = this.baseModels().filter(m => {
+      if (q && !m.name.toLowerCase().includes(q)) return false;
+      if (this.state.filter === 'fav' && !this.state.favs[m.id]) return false;
+      if (this.state.filter === 'progress' && m.status !== 'progress') return false;
+      return true;
+    });
+    if (!this.state.sortNew) models = models.slice().reverse();
+
+    const exts = ['glb', 'fbx', 'usdz', 'obj', 'mtl'];
+    const modelVals = models.map(m => {
+      const fav = !!this.state.favs[m.id];
+      const inProgress = m.status === 'progress';
+      return {
+        ...m,
+        thumbStyle: {
+          position: 'absolute', inset: 0,
+          backgroundImage: 'url("' + m.img + '")',
+          backgroundSize: 'cover', backgroundPosition: 'center',
+        },
+        statusLabel: inProgress ? 'В процессе' : 'Готово',
+        statusStyle: {
+          position: 'absolute', left: 12, top: 12, padding: '5px 12px', borderRadius: 100,
+          font: "600 11px 'Manrope',sans-serif",
+          background: inProgress ? 'rgba(10,13,18,.75)' : 'rgba(127,184,255,.9)',
+          color: inProgress ? '#e8edf4' : '#0a0d12',
+          border: inProgress ? '1px solid rgba(232,237,244,.25)' : 'none',
+          backdropFilter: 'blur(8px)',
+        },
+        favStyle: {
+          position: 'absolute', right: 12, top: 12, width: 30, height: 30, borderRadius: '50%',
+          display: 'grid', placeItems: 'center', cursor: 'pointer', fontSize: 14,
+          background: 'rgba(10,13,18,.7)', backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(232,237,244,.2)',
+          color: fav ? '#7fb8ff' : '#5c6676',
+        },
+        toggleFav: () => this.setState(s => ({ favs: { ...s.favs, [m.id]: !s.favs[m.id] } })),
+        formats: exts.map(ext => ({
+          ext,
+          title: 'Скачать ' + m.name + '.' + ext,
+          download: () => this.showToast('Скачивается ' + m.name + '.' + ext + '…'),
+        })),
+      };
+    });
+
+    const filterTabs = [
+      { key: 'all', label: 'Все' },
+      { key: 'fav', label: 'Избранное' },
+      { key: 'progress', label: 'В процессе' },
+    ].map(t => ({
+      ...t,
+      select: () => this.setState({ filter: t.key }),
+      style: {
+        font: "600 12px 'Manrope',sans-serif", padding: '8px 16px', borderRadius: 100,
+        cursor: 'pointer', userSelect: 'none',
+        background: this.state.filter === t.key ? '#7fb8ff' : 'transparent',
+        color: this.state.filter === t.key ? '#0a0d12' : '#e8edf4',
+      },
+    }));
+
+    const cols = Math.max(2, Math.min(4, this.props.gridColumns ?? 3));
+
+    const ribbonMap = { overview: 'ОБЗОР', models: 'МОИ МОДЕЛИ', payments: 'ИСТОРИЯ ПЛАТЕЖЕЙ', requests: 'ИСТОРИЯ ЗАПРОСОВ', password: 'СМЕНА ПАРОЛЯ' };
+
+    return {
+      isOverview, isModels, isPayments, isRequests, isPassword,
+      payments,
+      ribbonLabel: ribbonMap[view] || 'ОБЗОР',
+      toOverview: () => this.setState({ view: 'overview' }),
+      toModels: () => this.setState({ view: 'models' }),
+      toPayments: () => this.setState({ view: 'payments' }),
+      toRequests: () => this.setState({ view: 'requests' }),
+      toPassword: () => this.setState({ view: 'password' }),
+      navOverviewStyle: this.navStyle(isOverview),
+      navModelsStyle: this.navStyle(isModels),
+      navPaymentsStyle: this.navStyle(isPayments),
+      navRequestsStyle: this.navStyle(isRequests),
+      navPasswordStyle: this.navStyle(isPassword),
+      dotOverviewStyle: this.dotStyle(isOverview),
+      dotModelsStyle: this.dotStyle(isModels),
+      dotPaymentsStyle: this.dotStyle(isPayments),
+      dotRequestsStyle: this.dotStyle(isRequests),
+      dotPasswordStyle: this.dotStyle(isPassword),
+
+      // история запросов
+      requests, reqTabs,
+      reqEmpty: requests.length === 0,
+      reqSearchValue: this.state.reqSearch,
+      onReqSearch: e => this.setState({ reqSearch: e.target.value }),
+
+      // смена пароля
+      pwCurValue: this.state.pwCur,
+      pwNewValue: pwNew,
+      pwRepValue: this.state.pwRep,
+      onPwCur: e => this.setState({ pwCur: e.target.value }),
+      onPwNew: e => this.setState({ pwNew: e.target.value }),
+      onPwRep: e => this.setState({ pwRep: e.target.value }),
+      pwInputType: this.state.pwShow ? 'text' : 'password',
+      pwShowIcon: this.state.pwShow ? '◉' : '◎',
+      togglePwShow: () => this.setState(s => ({ pwShow: !s.pwShow })),
+      pwSeg1Style: seg(1), pwSeg2Style: seg(2), pwSeg3Style: seg(3),
+      pwStrengthLabel: strengthLabels[strength],
+      pwStrengthTextStyle: {
+        font: "600 11px 'Manrope',sans-serif", color: strengthColors[strength] || '#5c6676',
+        minWidth: 64, textAlign: 'right',
+        opacity: pwNew.length ? 1 : 0, transition: 'opacity .25s',
+      },
+      pwRepInputStyle: {
+        boxSizing: 'border-box', width: '100%', background: '#0a0d12',
+        border: '1px solid ' + (mismatch ? 'rgba(255,120,120,.55)' : 'rgba(232,237,244,.16)'),
+        borderRadius: 10, padding: '13px 16px',
+        font: "500 14px 'Manrope',sans-serif", color: '#e8edf4', outline: 'none',
+      },
+      pwMatchText: mismatch ? 'Пароли не совпадают' : (match ? 'Пароли совпадают' : ''),
+      pwMatchStyle: {
+        font: "500 12px 'Manrope',sans-serif",
+        color: mismatch ? '#ff9a9a' : '#8fe3b0',
+        minHeight: 16,
+      },
+      pwBtnStyle: {
+        font: "600 13px 'Manrope',sans-serif",
+        background: canSubmit ? '#7fb8ff' : 'rgba(232,237,244,.10)',
+        color: canSubmit ? '#0a0d12' : '#5c6676',
+        padding: '13px 26px', borderRadius: 100,
+        cursor: canSubmit ? 'pointer' : 'not-allowed',
+        userSelect: 'none', transition: 'all .25s',
+      },
+      doChangePassword: () => {
+        if (!canSubmit) {
+          const msg = !this.state.pwCur ? 'Введите текущий пароль'
+            : strength < 1 ? 'Новый пароль — минимум 8 символов'
+            : 'Пароли не совпадают';
+          this.setState({ pwToast: msg, pwToastOk: false });
+        } else {
+          this.setState({ pwCur: '', pwNew: '', pwRep: '', pwToast: 'Пароль изменён — остальные сессии завершены', pwToastOk: true });
+        }
+        clearTimeout(this._pwt);
+        this._pwt = setTimeout(() => this.setState({ pwToast: '' }), 3200);
+      },
+      pwToastText: this.state.pwToast,
+      pwToastStyle: {
+        font: "600 12px 'Manrope',sans-serif",
+        color: this.state.pwToastOk ? '#8fe3b0' : '#ff9a9a',
+        opacity: this.state.pwToast ? 1 : 0, transition: 'opacity .3s',
+      },
+
+      // overview
+      balanceText: this.state.balance.toFixed(2),
+      topupValue: this.state.topup,
+      onTopupInput: e => this.setState({ topup: e.target.value.replace(/[^\d]/g, '') }),
+      quickAmounts: [10, 50, 100, 500].map(v => ({
+        value: v,
+        add: () => this.setState(s => ({ topup: String((parseInt(s.topup, 10) || 0) + v) })),
+      })),
+      doTopup: () => {
+        const v = parseInt(this.state.topup, 10) || 0;
+        if (!v) { this.showToast('Введите сумму пополнения'); return; }
+        this.setState(s => {
+          const nb = +(s.balance + v).toFixed(2);
+          try { localStorage.setItem('3dgen_balance', String(nb)); } catch (e) {}
+          return { balance: nb, topup: '' };
+        });
+        this.showToast('Баланс пополнен на ' + v + ' кредитов');
+      },
+      toastText: this.state.toast,
+      toastStyle: {
+        font: "600 12px 'Manrope',sans-serif", color: '#7fb8ff',
+        opacity: this.state.toast ? 1 : 0, transition: 'opacity .3s',
+      },
+
+      // models
+      searchValue: this.state.search,
+      onSearch: e => this.setState({ search: e.target.value }),
+      filterTabs,
+      sortLabel: this.state.sortNew ? 'СНАЧАЛА НОВЫЕ' : 'СНАЧАЛА СТАРЫЕ',
+      toggleSort: () => this.setState(s => ({ sortNew: !s.sortNew })),
+      models: modelVals,
+      isEmpty: modelVals.length === 0,
+      gridStyle: {
+        display: 'grid', gap: 18,
+        gridTemplateColumns: 'repeat(' + cols + ',1fr)',
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

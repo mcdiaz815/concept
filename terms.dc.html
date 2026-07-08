@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
+a{color:#7fb8ff;text-decoration:none}
+a:hover{color:#a9ccff}
+</style>
+</helmet>
+
+<div data-screen-label="Условия использования 3dgen" style="position:relative;min-height:100vh">
+
+<!-- ФОНОВАЯ АТМОСФЕРА -->
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+  <div style="position:absolute;top:-14%;left:-8%;width:46vw;height:46vw;border-radius:50%;background:radial-gradient(circle,rgba(127,184,255,.12),transparent 62%);filter:blur(34px)"></div>
+  <div style="position:absolute;bottom:-18%;right:-10%;width:44vw;height:44vw;border-radius:50%;background:radial-gradient(circle,rgba(201,184,245,.1),transparent 62%);filter:blur(34px)"></div>
+</div>
+
+<!-- HEADER -->
+<div style="position:sticky;top:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:18px 5vw;background:rgba(10,13,18,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-bottom:1px solid rgba(232,237,244,.1)">
+  <a href="home.dc.html" style="font:700 17px 'Orbitron',sans-serif;color:#e8edf4">3DGEN<span style="color:#7fb8ff">.</span></a>
+  <div style="display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:5px;border-radius:100px">
+    <a href="home.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Главная</a>
+    <a href="home.dc.html#sec-price" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Тарифы</a>
+    <a href="catalog.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Галерея</a>
+    <a href="blog.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Блог</a>
+  </div>
+  <a href="account.dc.html" style="font:600 13px 'Manrope',sans-serif;background:#e8edf4;color:#0a0d12;padding:11px 22px;border-radius:100px" style-hover="background:#ffffff">Личный кабинет</a>
+</div>
+
+<!-- BODY -->
+<div style="position:relative;z-index:1;max-width:1160px;margin:0 auto;padding:70px 5vw 120px;display:grid;grid-template-columns:240px 1fr;gap:72px;align-items:start">
+
+  <!-- TOC -->
+  <div style="position:sticky;top:110px;display:flex;flex-direction:column;gap:16px">
+    <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.14em">НА ЭТОЙ СТРАНИЦЕ</div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ toc }}" as="t" hint-placeholder-count="5">
+        <div onClick="{{ t.go }}" style="{{ t.rowStyle }}" style-hover="color:#e8edf4">
+          <span style="{{ t.dotStyle }}"></span>{{ t.title }}
+        </div>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div style="max-width:760px">
+    <div style="font:800 clamp(38px,5vw,58px)/1.02 'Unbounded',sans-serif;letter-spacing:-.01em;text-wrap:balance">Условия использования</div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:34px;font:400 14px/1.7 'JetBrains Mono',monospace;color:#8a94a6">
+      <div>Дата вступления в силу: 1 июля 2026</div>
+      <div>Сайт: 3dgen.example</div>
+      <div>Контакт: <a href="mailto:support@3dgen.example">support@3dgen.example</a></div>
+    </div>
+
+    <div style="height:1px;background:rgba(232,237,244,.12);margin:36px 0 0"></div>
+
+    <div style="display:flex;flex-direction:column">
+      <sc-for list="{{ sections }}" as="s" hint-placeholder-count="5">
+        <div id="{{ s.id }}" data-sec="{{ s.id }}" style="padding:48px 0;border-bottom:1px solid rgba(232,237,244,.08);scroll-margin-top:120px">
+          <div style="font:400 11px 'JetBrains Mono',monospace;color:#7fb8ff;letter-spacing:.16em;margin-bottom:16px">§ {{ s.num }}</div>
+          <div style="font:700 clamp(22px,2.4vw,28px)/1.2 'Manrope',sans-serif;color:#e8edf4;letter-spacing:-.005em">{{ s.title }}</div>
+          <div style="font:400 16px/1.75 'Manrope',sans-serif;color:#9aa4b2;margin-top:16px;max-width:660px;text-wrap:pretty">{{ s.body }}</div>
+        </div>
+      </sc-for>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:40px">
+      <div style="font:400 13px 'JetBrains Mono',monospace;color:#5c6676">Остались вопросы?</div>
+      <a href="mailto:support@3dgen.example" style="font:600 13px 'Manrope',sans-serif;color:#0a0d12;background:#7fb8ff;padding:11px 22px;border-radius:100px" style-hover="background:#a9ccff">Написать в поддержку</a>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { active: 'intro' };
+
+  SECTIONS = [
+    { id: 'intro', title: 'Введение', body: 'Добро пожаловать в 3dgen. Наш сервис использует нейросети для генерации 3D-моделей из текстовых описаний или изображений за считанные секунды. Используя сайт, вы соглашаетесь с настоящими условиями.' },
+    { id: 'usage', title: 'Использование сервиса', body: 'Вы обязуетесь использовать сервис только в законных целях и не нарушать права третьих лиц при генерации и использовании 3D-моделей.' },
+    { id: 'billing', title: 'Оплата и кредиты', body: 'Генерация моделей списывает кредиты с вашего баланса согласно выбранному тарифу. Кредиты не подлежат возврату, за исключением случаев, предусмотренных политикой возврата.' },
+    { id: 'content', title: 'Права на контент', body: 'Сгенерированные модели принадлежат пользователю, при условии соблюдения условий использования базовой нейросети.' },
+    { id: 'liability', title: 'Ограничение ответственности', body: 'Сервис предоставляется «как есть», без каких-либо гарантий точности или пригодности сгенерированного контента для конкретных целей.' },
+  ];
+
+  componentDidMount() {
+    this.scrollTo = (id) => {
+      const el = document.getElementById(id);
+      if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 110, behavior: 'smooth' });
+    };
+    const tick = () => {
+      let cur = this.SECTIONS[0].id;
+      this.SECTIONS.forEach(s => {
+        const el = document.getElementById(s.id);
+        if (el && el.getBoundingClientRect().top < 160) cur = s.id;
+      });
+      if (cur !== this.state.active) this.setState({ active: cur });
+      this._raf = requestAnimationFrame(tick);
+    };
+    this._raf = requestAnimationFrame(tick);
+  }
+  componentWillUnmount() { cancelAnimationFrame(this._raf); }
+
+  renderVals() {
+    const active = this.state.active;
+    const sections = this.SECTIONS.map((s, i) => ({
+      ...s,
+      num: String(i + 1).padStart(2, '0'),
+    }));
+    const toc = this.SECTIONS.map(s => {
+      const on = s.id === active;
+      return {
+        id: s.id, title: s.title,
+        go: () => this.scrollTo(s.id),
+        rowStyle: {
+          display: 'flex', alignItems: 'center', gap: 12,
+          font: (on ? '600' : '500') + " 13px 'Manrope',sans-serif",
+          color: on ? '#e8edf4' : '#8a94a6',
+          padding: '7px 0', cursor: 'pointer', userSelect: 'none',
+          transition: 'color .2s',
+        },
+        dotStyle: {
+          width: 7, height: 7, borderRadius: '50%', flex: 'none',
+          background: on ? '#7fb8ff' : '#3a4453',
+          boxShadow: on ? '0 0 10px rgba(127,184,255,.7)' : 'none',
+          transition: 'all .2s',
+        },
+      };
+    });
+    return { sections, toc };
+  }
+}
+</script>
+</body>
+</html>
