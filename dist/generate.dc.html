@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
+a{color:#7fb8ff;text-decoration:none}
+a:hover{color:#a9ccff}
+input::placeholder,textarea::placeholder{color:#5c6676}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes floatY{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes turntable{0%{transform:scale(1.04) translateX(-2%)}50%{transform:scale(1.04) translateX(2%)}100%{transform:scale(1.04) translateX(-2%)}}
+</style>
+</helmet>
+
+<div data-screen-label="Генерация 3dgen" style="position:relative;min-height:100vh;display:flex;flex-direction:column">
+
+<!-- ФОНОВАЯ АТМОСФЕРА -->
+<div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+  <div style="position:absolute;top:-12%;left:-6%;width:52vw;height:52vw;border-radius:50%;background:radial-gradient(circle,rgba(127,184,255,.16),transparent 62%);filter:blur(30px)"></div>
+  <div style="position:absolute;bottom:-16%;right:-8%;width:48vw;height:48vw;border-radius:50%;background:radial-gradient(circle,rgba(201,184,245,.13),transparent 62%);filter:blur(30px)"></div>
+  <div style="position:absolute;inset:0;background-image:radial-gradient(rgba(232,237,244,.055) 1px,transparent 1px);background-size:28px 28px;-webkit-mask-image:radial-gradient(circle at 50% 26%,#000,transparent 72%);mask-image:radial-gradient(circle at 50% 26%,#000,transparent 72%)"></div>
+</div>
+
+<!-- HEADER -->
+<div style="position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;padding:20px 5vw">
+  <a href="home.dc.html" style="font:700 16px 'Orbitron',sans-serif;color:#e8edf4">3DGEN<span style="color:#7fb8ff">.</span></a>
+  <div style="display:flex;gap:4px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:5px;border-radius:100px">
+    <a href="home.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Главная</a>
+    <a href="catalog.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Каталог</a>
+    <a href="account.dc.html" style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;padding:8px 16px;border-radius:100px" style-hover="background:rgba(255,255,255,.14)">Кабинет</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;background:rgba(127,184,255,.10);border:1px solid rgba(127,184,255,.3);padding:9px 16px;border-radius:100px">
+    <span style="font:600 13px 'Manrope',sans-serif;color:#e8edf4">Баланс: <span style="color:#7fb8ff">{{ balanceText }}</span> кред.</span>
+  </div>
+</div>
+
+<!-- РИББОН -->
+<div style="position:relative;z-index:1;padding:0 5vw">
+  <div style="display:flex;justify-content:space-between;font:400 12px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em;padding:18px 0;border-bottom:1px solid rgba(232,237,244,.14)">
+    <span>ГЕНЕРАЦИЯ</span><span>{{ ribbonLabel }}</span><span>ГЕНЕРАЦИЯ</span>
+  </div>
+</div>
+
+<div style="position:relative;z-index:1;flex:1;padding:40px 5vw 80px;box-sizing:border-box;display:flex;justify-content:center">
+<div style="width:100%;max-width:1020px">
+
+<!-- ================= ЭКРАН ВВОДА ================= -->
+<sc-if value="{{ isInput }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="Генерация — ввод" style="display:flex;flex-direction:column;gap:32px">
+
+  <div style="display:flex;flex-direction:column;gap:14px">
+    <div style="font:800 40px/1.05 'Unbounded',sans-serif">Новая генерация</div>
+    <div style="font:400 15px/1.6 'Manrope',sans-serif;color:#8a94a6;max-width:560px;text-wrap:pretty">Опишите объект словами или загрузите изображение — нейросеть построит готовую 3D-модель за секунды.</div>
+  </div>
+
+  <!-- переключатель режима -->
+  <div style="display:flex;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:6px;border-radius:14px;align-self:flex-start">
+    <div onClick="{{ toText }}" style="{{ tabTextStyle }}">Из текста</div>
+    <div onClick="{{ toImage }}" style="{{ tabImageStyle }}">Из изображения</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:24px;align-items:start">
+
+    <!-- ЛЕВО: ввод -->
+    <div style="display:flex;flex-direction:column;gap:24px">
+
+      <!-- ТЕКСТ -->
+      <sc-if value="{{ isText }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(127,184,255,.12);border:1px solid rgba(127,184,255,.24);display:grid;place-items:center;font:600 12px 'Manrope',sans-serif;color:#7fb8ff;flex:none">✎</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">ОПИСАНИЕ ОБЪЕКТА</span>
+        </div>
+        <textarea value="{{ promptValue }}" onChange="{{ onPrompt }}" placeholder="Например: средневековый рыцарский шлем с гравировкой и потёртостями на металле…" style="min-height:150px;resize:vertical;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:14px;padding:18px 20px;font:500 15px/1.55 'Manrope',sans-serif;color:#e8edf4;outline:none;transition:border-color .2s, box-shadow .2s" style-focus="border-color:#7fb8ff;box-shadow:0 0 0 4px rgba(127,184,255,.12)"></textarea>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676">Подсказки:</span>
+          <sc-for list="{{ prompts }}" as="p" hint-placeholder-count="4">
+            <div onClick="{{ p.use }}" style="font:500 12px 'Manrope',sans-serif;color:#e8edf4;border:1px solid rgba(232,237,244,.16);padding:7px 14px;border-radius:100px;cursor:pointer;user-select:none" style-hover="border-color:#7fb8ff;color:#7fb8ff">{{ p.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ИЗОБРАЖЕНИЕ -->
+      <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(127,184,255,.12);border:1px solid rgba(127,184,255,.24);display:grid;place-items:center;font:600 12px 'Manrope',sans-serif;color:#7fb8ff;flex:none">▣</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">ДОБАВЬТЕ ИЗОБРАЖЕНИЕ</span>
+        </div>
+        <div style="position:relative;aspect-ratio:16/10;border:1.5px dashed rgba(127,184,255,.4);border-radius:14px;overflow:hidden;background:#10161f">
+          <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="gen-src" shape="rect" placeholder="Перетащите файл сюда или нажмите «Выбрать файл»" hint-size="100%,100%"></x-import>
+        </div>
+        <div style="font:400 12px/1.6 'Manrope',sans-serif;color:#5c6676;text-wrap:pretty">Поддерживаются .png, .jpg, .jpeg до 20 МБ. Лучше всего работают фото объекта на однотонном фоне.</div>
+      </div>
+      </sc-if>
+
+      <!-- СИММЕТРИЯ -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(127,184,255,.12);border:1px solid rgba(127,184,255,.24);display:grid;place-items:center;font:600 13px 'Manrope',sans-serif;color:#7fb8ff;flex:none">◐</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">СИММЕТРИЯ</span>
+        </div>
+        <div style="display:flex;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:4px;gap:4px">
+          <sc-for list="{{ symmetryOpts }}" as="o" hint-placeholder-count="3">
+            <div onClick="{{ o.select }}" style="{{ o.style }}">{{ o.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- СТИЛЬ (только текст) -->
+      <sc-if value="{{ isText }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(201,184,245,.14);border:1px solid rgba(201,184,245,.28);display:grid;place-items:center;font:600 12px 'Manrope',sans-serif;color:#c9b8f5;flex:none">✦</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">СТИЛЬ</span>
+        </div>
+        <div style="display:flex;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:4px;gap:4px">
+          <sc-for list="{{ styleOpts }}" as="o" hint-placeholder-count="2">
+            <div onClick="{{ o.select }}" style="{{ o.style }}">{{ o.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ДЕТАЛИЗАЦИЯ -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(127,184,255,.12);border:1px solid rgba(127,184,255,.24);display:grid;place-items:center;font:600 12px 'Manrope',sans-serif;color:#7fb8ff;flex:none">▦</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">ДЕТАЛИЗАЦИЯ</span>
+          <span title="Влияет на количество полигонов и стоимость генерации" style="width:15px;height:15px;border-radius:50%;border:1px solid rgba(232,237,244,.28);display:grid;place-items:center;font:600 9px 'Manrope',sans-serif;color:#8a94a6;cursor:help">i</span>
+        </div>
+        <div style="display:flex;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:4px;gap:4px">
+          <sc-for list="{{ detailOpts }}" as="o" hint-placeholder-count="3">
+            <div onClick="{{ o.select }}" style="{{ o.style }}">{{ o.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- ТОПОЛОГИЯ -->
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:9px">
+          <span style="width:24px;height:24px;border-radius:7px;background:rgba(143,227,176,.13);border:1px solid rgba(143,227,176,.28);display:grid;place-items:center;font:600 12px 'Manrope',sans-serif;color:#8fe3b0;flex:none">◈</span>
+          <span style="font:400 11px 'JetBrains Mono',monospace;color:#8a94a6;letter-spacing:.12em">ТОПОЛОГИЯ</span>
+          <span title="Треугольники — для игр и AR; квады — для дальнейшего редактирования" style="width:15px;height:15px;border-radius:50%;border:1px solid rgba(232,237,244,.28);display:grid;place-items:center;font:600 9px 'Manrope',sans-serif;color:#8a94a6;cursor:help">i</span>
+        </div>
+        <div style="display:flex;background:#10161f;border:1px solid rgba(232,237,244,.16);border-radius:10px;padding:4px;gap:4px">
+          <sc-for list="{{ topologyOpts }}" as="o" hint-placeholder-count="2">
+            <div onClick="{{ o.select }}" style="{{ o.style }}">{{ o.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+
+      <!-- PBR (только изображение) -->
+      <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+      <div onClick="{{ togglePbr }}" style="display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;align-self:flex-start">
+        <div style="{{ pbrBoxStyle }}">{{ pbrMark }}</div>
+        <span style="font:500 14px 'Manrope',sans-serif;color:#e8edf4">Реалистичные текстуры (PBR)</span>
+      </div>
+      </sc-if>
+
+    </div>
+
+    <!-- ПРАВО: спек-чек + запуск -->
+    <div style="position:sticky;top:32px;border-radius:18px;overflow:hidden;background:linear-gradient(180deg,#131c29,#0d131c);border:1px solid rgba(127,184,255,.16);box-shadow:0 24px 70px rgba(0,0,0,.5)">
+
+      <!-- шапка с 3D-орбом -->
+      <div style="display:flex;align-items:center;gap:14px;padding:20px 22px;border-bottom:1px solid rgba(232,237,244,.08)">
+        <div style="width:46px;height:46px;border-radius:50%;background:conic-gradient(from 0deg,#7fb8ff,#c9b8f5,#8fe3b0,#7fb8ff);animation:spin 6s linear infinite;flex:none;box-shadow:0 0 22px rgba(127,184,255,.45);-webkit-mask:radial-gradient(circle,transparent 42%,#000 43%);mask:radial-gradient(circle,transparent 42%,#000 43%)"></div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <div style="font:700 15px 'Manrope',sans-serif;color:#e8edf4">Спецификация</div>
+          <div style="font:400 10px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.14em">ПАРАМЕТРЫ ЗАПУСКА</div>
+        </div>
+      </div>
+
+      <!-- строки с точечными выносками -->
+      <div style="padding:20px 22px;display:flex;flex-direction:column;gap:13px">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">Режим</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ modeLabel }}</span>
+        </div>
+        <sc-if value="{{ isText }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">Стиль</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ styleLabel }}</span>
+        </div>
+        </sc-if>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">Симметрия</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ symmetryLabel }}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">Детализация</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ detailLabel }}</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">Топология</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ topologyLabel }}</span>
+        </div>
+        <sc-if value="{{ isImage }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:baseline;gap:8px">
+          <span style="font:400 12px 'Manrope',sans-serif;color:#8a94a6;flex:none">PBR-текстуры</span>
+          <span style="flex:1;height:0;border-bottom:1px dotted rgba(232,237,244,.2);transform:translateY(-3px)"></span>
+          <span style="font:600 12px 'Manrope',sans-serif;color:#e8edf4;flex:none">{{ pbrLabel }}</span>
+        </div>
+        </sc-if>
+      </div>
+
+      <!-- разрыв-перфорация -->
+      <div style="height:1px;margin:0 22px;background:repeating-linear-gradient(90deg,rgba(232,237,244,.28) 0 5px,transparent 5px 11px)"></div>
+
+      <!-- стоимость + запуск -->
+      <div style="padding:20px 22px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font:400 10px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.14em">СПИШЕТСЯ</span>
+            <span style="font:400 11px 'Manrope',sans-serif;color:#8a94a6">Баланс после: <span style="{{ afterStyle }}">{{ afterText }} кред.</span></span>
+          </div>
+          <span style="font:900 32px/1 'Orbitron',sans-serif;color:#7fb8ff;text-shadow:0 0 26px rgba(127,184,255,.55)">{{ costText }}</span>
+        </div>
+        <div onClick="{{ startGen }}" style="{{ genBtnStyle }}">{{ genBtnLabel }}</div>
+        <div style="{{ warnStyle }}">Недостаточно кредитов — пополните баланс в кабинете</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</sc-if>
+
+<!-- ================= ЭКРАН ГЕНЕРАЦИИ ================= -->
+<sc-if value="{{ isGenerating }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Генерация — процесс" style="display:flex;flex-direction:column;align-items:center;gap:40px;padding:6vh 0">
+
+  <div style="position:relative;width:220px;height:220px;display:grid;place-items:center">
+    <div style="position:absolute;inset:0;border-radius:50%;border:2px solid rgba(127,184,255,.14)"></div>
+    <div style="position:absolute;inset:0;border-radius:50%;border:2px solid transparent;border-top-color:#7fb8ff;border-right-color:#7fb8ff;animation:spin 1.1s linear infinite"></div>
+    <div style="position:absolute;inset:26px;border-radius:50%;border:2px solid transparent;border-bottom-color:#c9b8f5;animation:spin 1.6s linear infinite reverse"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="font:700 40px 'Orbitron',sans-serif;color:#e8edf4">{{ progressPct }}</div>
+      <div style="font:400 10px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.14em">СБОРКА МЕША</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;display:flex;flex-direction:column;gap:10px">
+    <div style="font:800 26px 'Manrope',sans-serif;color:#e8edf4">{{ genStageLabel }}</div>
+    <div style="font:400 14px 'Manrope',sans-serif;color:#8a94a6;max-width:420px">«{{ genSubject }}»</div>
+  </div>
+
+  <!-- шаги -->
+  <div style="width:100%;max-width:460px;display:flex;flex-direction:column;gap:14px">
+    <sc-for list="{{ genSteps }}" as="g" hint-placeholder-count="4">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="{{ g.dotStyle }}">{{ g.mark }}</div>
+        <div style="{{ g.labelStyle }}">{{ g.label }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">Не закрывайте вкладку — модель появится здесь автоматически</div>
+</div>
+</sc-if>
+
+<!-- ================= ЭКРАН РЕЗУЛЬТАТА ================= -->
+<sc-if value="{{ isResult }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Генерация — результат" style="display:flex;flex-direction:column;gap:28px">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="width:9px;height:9px;border-radius:50%;background:#8fe3b0;flex:none"></span>
+      <div style="font:800 30px 'Unbounded',sans-serif;line-height:1.05">Готово</div>
+    </div>
+    <div style="font:400 12px 'JetBrains Mono',monospace;color:#5c6676">СГЕНЕРИРОВАНО ЗА {{ resultTime }}</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start">
+
+    <!-- 3D превью -->
+    <div style="position:relative;aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:radial-gradient(circle at 50% 40%,#182234,#0a0d12);border:1px solid rgba(232,237,244,.10)">
+      {{ resultImgEl }}
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 60%,rgba(10,13,18,.55))"></div>
+      <div style="position:absolute;left:14px;top:14px;display:flex;gap:8px">
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:#0a0d12;background:#8fe3b0;padding:5px 12px;border-radius:100px">3D-МЕШ</span>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:#e8edf4;background:rgba(10,13,18,.6);backdrop-filter:blur(8px);padding:5px 12px;border-radius:100px">{{ styleLabel }}</span>
+      </div>
+      <div style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;font:400 11px 'JetBrains Mono',monospace;color:#e8edf4;background:rgba(10,13,18,.6);backdrop-filter:blur(8px);padding:8px 16px;border-radius:100px">
+        <span style="width:6px;height:6px;border-radius:50%;background:#7fb8ff;animation:floatY 2s ease-in-out infinite"></span>ПЕРЕТАЩИТЕ, ЧТОБЫ ВРАЩАТЬ
+      </div>
+    </div>
+
+    <!-- инфо + действия -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="font:700 22px 'Manrope',sans-serif;color:#e8edf4">{{ resultName }}</div>
+        <div style="font:400 13px/1.55 'Manrope',sans-serif;color:#8a94a6;text-wrap:pretty">«{{ genSubject }}»</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:12px;padding:16px">
+          <div style="font:400 10px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ПОЛИГОНОВ</div>
+          <div style="font:700 20px 'Orbitron',sans-serif;color:#e8edf4;margin-top:8px">48.2K</div>
+        </div>
+        <div style="background:#10161f;border:1px solid rgba(232,237,244,.10);border-radius:12px;padding:16px">
+          <div style="font:400 10px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.1em">ТЕКСТУРА</div>
+          <div style="font:700 20px 'Orbitron',sans-serif;color:#e8edf4;margin-top:8px">2048²</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font:400 11px 'JetBrains Mono',monospace;color:#5c6676;letter-spacing:.12em">СКАЧАТЬ В ФОРМАТЕ</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <sc-for list="{{ formats }}" as="f" hint-placeholder-count="5">
+            <div onClick="{{ f.download }}" style="font:600 12px 'JetBrains Mono',monospace;color:#8a94a6;border:1px solid rgba(232,237,244,.16);padding:9px 16px;border-radius:100px;cursor:pointer;user-select:none;transition:all .2s" style-hover="color:#0a0d12;background:#7fb8ff;border-color:#7fb8ff">{{ f.ext }}</div>
+          </sc-for>
+        </div>
+        <div style="{{ dlToastStyle }}">{{ dlToastText }}</div>
+      </div>
+
+      <div style="height:1px;background:rgba(232,237,244,.10)"></div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div onClick="{{ regen }}" style="font:700 14px 'Manrope',sans-serif;background:#7fb8ff;color:#0a0d12;padding:14px 0;text-align:center;border-radius:100px;cursor:pointer;user-select:none" style-hover="background:#a9ccff">Сгенерировать ещё</div>
+        <a href="account.dc.html" style="font:600 13px 'Manrope',sans-serif;color:#e8edf4;border:1px solid rgba(232,237,244,.16);padding:13px 0;text-align:center;border-radius:100px" style-hover="border-color:#7fb8ff;color:#7fb8ff">Открыть в «Мои модели»</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: { &quot;width&quot;: 1200, &quot;height&quot;: 860 },
+  &quot;startCost&quot;: { &quot;editor&quot;: &quot;range&quot;, &quot;min&quot;: 4, &quot;max&quot;: 30, &quot;step&quot;: 1, &quot;default&quot;: 12, &quot;tsType&quot;: &quot;number&quot;, &quot;section&quot;: &quot;Генерация&quot; }
+}">
+class Component extends DCLogic {
+  state = {
+    mode: 'text', phase: 'input',
+    prompt: '',
+    symmetry: 'auto', style: 'real', detail: 'low', topology: 'tri', pbr: false,
+    balance: 4.00,
+    progress: 0, stepIdx: 0,
+    subject: '', dlToast: '',
+  };
+
+  COST = 12;
+
+  SYMMETRY = [{ key: 'off', label: 'Выкл' }, { key: 'auto', label: 'Авто' }, { key: 'on', label: 'Вкл' }];
+  STYLE    = [{ key: 'sculpt', label: 'Скульптура' }, { key: 'real', label: 'Реалистичный' }];
+  DETAIL   = [{ key: 'low', label: 'Низкая', add: 0 }, { key: 'mid', label: 'Средняя', add: 4 }, { key: 'high', label: 'Высокая', add: 10 }];
+  TOPOLOGY = [{ key: 'tri', label: 'Треугольники' }, { key: 'quad', label: 'Квады' }];
+
+  seg(opts, cur, onSel) {
+    return opts.map(o => {
+      const on = o.key === cur;
+      return {
+        ...o,
+        select: () => onSel(o.key),
+        style: {
+          flex: 1, textAlign: 'center',
+          font: (on ? '700' : '600') + " 13px 'Manrope',sans-serif",
+          color: on ? '#08111c' : '#8a94a6',
+          background: on ? 'linear-gradient(135deg,#8fc6ff,#7fb8ff)' : 'transparent',
+          boxShadow: on ? '0 4px 18px rgba(127,184,255,.4), inset 0 1px 0 rgba(255,255,255,.35)' : 'none',
+          padding: '11px 8px', borderRadius: 8, cursor: 'pointer', userSelect: 'none',
+          transition: 'all .2s cubic-bezier(.2,.8,.2,1)',
+        },
+      };
+    });
+  }
+
+  GEN_STEPS = [
+    'Анализ запроса',
+    'Построение геометрии',
+    'Наложение текстур',
+    'Финальная сборка меша',
+  ];
+
+  RESULT_IMGS = ['assets/hero.jpg', 'assets/x_f.jpg', 'assets/y_r1.jpg', 'assets/c_c5.jpg'];
+
+  showDl(msg) {
+    this.setState({ dlToast: msg });
+    clearTimeout(this._dt);
+    this._dt = setTimeout(() => this.setState({ dlToast: '' }), 2600);
+  }
+
+  runGeneration() {
+    const subject = this.state.mode === 'text'
+      ? (this.state.prompt.trim() || 'Объект по описанию')
+      : 'Модель из загруженного изображения';
+    this.setState({ phase: 'generating', progress: 0, stepIdx: 0, subject });
+    clearInterval(this._gi);
+    this._gi = setInterval(() => {
+      this.setState(s => {
+        const np = Math.min(100, s.progress + (2 + Math.random() * 5));
+        const stepIdx = Math.min(this.GEN_STEPS.length - 1, Math.floor(np / (100 / this.GEN_STEPS.length)));
+        if (np >= 100) {
+          clearInterval(this._gi);
+          this._done = setTimeout(() => this.setState(st => ({
+            phase: 'result',
+            balance: Math.max(0, +(st.balance - this.COST / 8 * 0).toFixed(2)),
+          })), 500);
+          return { progress: 100, stepIdx: this.GEN_STEPS.length - 1 };
+        }
+        return { progress: np, stepIdx };
+      });
+    }, 220);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._gi);
+    clearTimeout(this._done);
+    clearTimeout(this._dt);
+  }
+
+  renderVals() {
+    const { mode, phase, style } = this.state;
+    const isInput = phase === 'input';
+    const isGenerating = phase === 'generating';
+    const isResult = phase === 'result';
+    const isText = mode === 'text';
+    const isImage = mode === 'image';
+
+    const detailObj = this.DETAIL.find(d => d.key === this.state.detail) || this.DETAIL[0];
+    const styleObj = this.STYLE.find(s => s.key === style) || this.STYLE[1];
+    const symObj = this.SYMMETRY.find(s => s.key === this.state.symmetry) || this.SYMMETRY[1];
+    const topoObj = this.TOPOLOGY.find(t => t.key === this.state.topology) || this.TOPOLOGY[0];
+
+    const base = this.props.startCost ?? this.COST;
+    const cost = base + detailObj.add + (isImage && this.state.pbr ? 3 : 0);
+    const balCredits = this.state.balance;
+    const enough = balCredits >= 0; // demo: always allow
+    const afterCredits = balCredits; // credits balance unaffected in this demo mock
+
+    const tab = (active) => ({
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      font: (active ? '700' : '600') + " 14px 'Manrope',sans-serif",
+      color: active ? '#08111c' : '#e8edf4',
+      background: active ? 'linear-gradient(135deg,#8fc6ff,#7fb8ff)' : 'transparent',
+      boxShadow: active ? '0 6px 22px rgba(127,184,255,.42), inset 0 1px 0 rgba(255,255,255,.4)' : 'none',
+      padding: '11px 22px', borderRadius: 10, cursor: 'pointer', userSelect: 'none',
+      transition: 'all .22s cubic-bezier(.2,.8,.2,1)',
+    });
+    const symmetryOpts = this.seg(this.SYMMETRY, this.state.symmetry, k => this.setState({ symmetry: k }));
+    const styleOpts    = this.seg(this.STYLE, this.state.style, k => this.setState({ style: k }));
+    const detailOpts   = this.seg(this.DETAIL, this.state.detail, k => this.setState({ detail: k }));
+    const topologyOpts = this.seg(this.TOPOLOGY, this.state.topology, k => this.setState({ topology: k }));
+
+    const promptSamples = [
+      'Рыцарский шлем с гравировкой',
+      'Милый робот-помощник',
+      'Кофейная кружка в стиле ретро',
+      'Фэнтезийный дракон',
+    ];
+    const prompts = promptSamples.map(label => ({
+      label,
+      use: () => this.setState({ prompt: label }),
+    }));
+
+    // generation steps ui
+    const genSteps = this.GEN_STEPS.map((label, i) => {
+      const done = i < this.state.stepIdx;
+      const active = i === this.state.stepIdx;
+      return {
+        label,
+        mark: done ? '✓' : '',
+        dotStyle: {
+          width: 26, height: 26, borderRadius: '50%', flex: 'none',
+          display: 'grid', placeItems: 'center',
+          font: "700 12px 'Manrope',sans-serif",
+          background: done ? '#7fb8ff' : (active ? 'rgba(127,184,255,.15)' : 'rgba(232,237,244,.06)'),
+          color: done ? '#0a0d12' : (active ? '#7fb8ff' : '#5c6676'),
+          border: active ? '1px solid #7fb8ff' : '1px solid transparent',
+        },
+        labelStyle: {
+          font: (active || done ? '600' : '400') + " 14px 'Manrope',sans-serif",
+          color: done ? '#8a94a6' : (active ? '#e8edf4' : '#5c6676'),
+        },
+      };
+    });
+
+    const formats = ['glb', 'fbx', 'usdz', 'obj', 'stl'].map(ext => ({
+      ext,
+      download: () => this.showDl('Скачивается ' + this.resultNameStr() + '.' + ext + '…'),
+    }));
+
+    return {
+      isInput, isGenerating, isResult, isText, isImage,
+      balanceText: balCredits.toFixed(2),
+      ribbonLabel: isInput ? (isText ? 'ИЗ ТЕКСТА' : 'ИЗ ИЗОБРАЖЕНИЯ') : (isGenerating ? 'ОБРАБОТКА' : 'РЕЗУЛЬТАТ'),
+
+      toText: () => this.setState({ mode: 'text' }),
+      toImage: () => this.setState({ mode: 'image' }),
+      tabTextStyle: tab(isText), tabImageStyle: tab(isImage),
+
+      promptValue: this.state.prompt,
+      onPrompt: e => this.setState({ prompt: e.target.value }),
+      prompts,
+
+      symmetryOpts, styleOpts, detailOpts, topologyOpts,
+      pbrMark: this.state.pbr ? '✓' : '',
+      pbrBoxStyle: {
+        width: 22, height: 22, borderRadius: 6, flex: 'none',
+        display: 'grid', placeItems: 'center',
+        font: "700 12px 'Manrope',sans-serif", color: '#0a0d12',
+        background: this.state.pbr ? '#7fb8ff' : 'transparent',
+        border: '1px solid ' + (this.state.pbr ? '#7fb8ff' : 'rgba(232,237,244,.3)'),
+        transition: 'all .18s',
+      },
+      togglePbr: () => this.setState(s => ({ pbr: !s.pbr })),
+
+      modeLabel: isText ? 'Из текста' : 'Из изображения',
+      styleLabel: styleObj.label,
+      symmetryLabel: symObj.label,
+      detailLabel: detailObj.label,
+      topologyLabel: topoObj.label,
+      pbrLabel: this.state.pbr ? 'Вкл' : 'Выкл',
+      costText: cost + ' кред.',
+      afterText: afterCredits.toFixed(2),
+      afterStyle: {
+        font: "600 12px 'JetBrains Mono',monospace",
+        color: enough ? '#e8edf4' : '#ff9a9a',
+      },
+      genBtnLabel: 'Сгенерировать · ' + cost + ' кред.',
+      genBtnStyle: {
+        font: "700 14px 'Manrope',sans-serif",
+        background: enough ? 'linear-gradient(135deg,#8fc6ff,#7fb8ff)' : 'rgba(232,237,244,.10)',
+        color: enough ? '#08111c' : '#5c6676',
+        padding: '15px 0', textAlign: 'center', borderRadius: 100,
+        cursor: enough ? 'pointer' : 'not-allowed', userSelect: 'none',
+        boxShadow: enough ? '0 10px 32px rgba(127,184,255,.42), inset 0 1px 0 rgba(255,255,255,.4)' : 'none',
+        transition: 'all .2s',
+      },
+      startGen: () => { if (enough) this.runGeneration(); },
+      warnStyle: {
+        font: "500 12px 'Manrope',sans-serif", color: '#ff9a9a',
+        textAlign: 'center', display: enough ? 'none' : 'block',
+      },
+
+      // generating
+      progressPct: Math.round(this.state.progress) + '%',
+      genStageLabel: this.GEN_STEPS[this.state.stepIdx] + '…',
+      genSubject: this.state.subject,
+      genSteps,
+
+      // result
+      resultTime: '31 СЕК',
+      resultImgEl: isResult ? React.createElement('img', {
+        src: this.RESULT_IMGS[Math.floor(this.state.balance) % this.RESULT_IMGS.length] || this.RESULT_IMGS[0],
+        alt: '',
+        style: { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', animation: 'turntable 9s ease-in-out infinite' },
+      }) : null,
+      resultName: this.resultNameStr(),
+      formats,
+      dlToastText: this.state.dlToast,
+      dlToastStyle: {
+        font: "600 12px 'Manrope',sans-serif", color: '#7fb8ff', minHeight: 16,
+        opacity: this.state.dlToast ? 1 : 0, transition: 'opacity .3s',
+      },
+      regen: () => this.setState({ phase: 'input', progress: 0, stepIdx: 0 }),
+    };
+  }
+
+  resultNameStr() {
+    const s = (this.state.subject || '').trim();
+    if (!s || s === 'Объект по описанию' || s.startsWith('Модель из')) return 'Untitled Model';
+    return s.length > 26 ? s.slice(0, 26) + '…' : s;
+  }
+}
+</script>
+</body>
+</html>
