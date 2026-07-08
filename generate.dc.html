@@ -14,6 +14,12 @@
 body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
 a{color:#7fb8ff;text-decoration:none}
 a:hover{color:#a9ccff}
+@media (max-width:900px){
+  [style*="justify-content: space-between"][style*="padding: 20px 5vw"]{flex-wrap:wrap !important;justify-content:center !important;gap:12px !important}
+  [style*="gap: 4px"][style*="border-radius: 100px"]{flex-wrap:wrap !important;justify-content:center}
+  [style*="grid-template-columns: 1fr 320px"]{grid-template-columns:1fr !important}
+  [style*="grid-template-columns: 1.3fr 1fr"]{grid-template-columns:1fr !important}
+}
 input::placeholder,textarea::placeholder{color:#5c6676}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes floatY{0%,100%{transform:translateY(-6px)}50%{transform:translateY(6px)}}

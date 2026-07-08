@@ -14,6 +14,10 @@
 body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
 a{color:#7fb8ff;text-decoration:none}
 a:hover{color:#a9ccff}
+@media (max-width:900px){
+  [style*="grid-template-columns: minmax(380px, 44%) 1fr"]{grid-template-columns:1fr !important}
+  [style*="justify-content: space-between"][style*="padding: 40px 44px"]{display:none !important}
+}
 input::placeholder{color:#5c6676}
 </style>
 </helmet>
