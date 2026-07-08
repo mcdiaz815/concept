@@ -22,24 +22,24 @@ html{scroll-behavior:auto}
 body{margin:0;background:#0a0d12;color:#e8edf4;font-family:'Manrope',system-ui,sans-serif}
 a{color:#7fb8ff;text-decoration:none}
 a:hover{color:#a9ccff}
-@keyframes floatY{0%,100%{transform:translateY(-8px)}50%{transform:translateY(8px)}}
 @media (max-width:900px){
-  /* нижняя правая панель дублирует меню слева — прячем на мобильном */
   [style*="right: 20px; bottom: 20px"][style*="position: fixed"]{display:none !important}
-  /* многоколоночные сетки -> одна колонка */
   [style*="grid-template-columns: repeat(3, 1fr)"]{grid-template-columns:1fr !important}
   [style*="grid-template-columns: 1fr 1fr; gap: 4vw"]{grid-template-columns:1fr !important}
   [style*="grid-template-columns: 1fr 1fr; gap: 5vw"]{grid-template-columns:1fr !important}
   [style*="grid-template-columns: 1fr 1fr; border-top"]{grid-template-columns:1fr !important}
-  /* степпер: стек колонок, компактнее картинка */
   [style*="grid-template-columns: 1fr 1.1fr"]{grid-template-columns:1fr !important;gap:3vh !important;align-content:center}
   [style*="height: 66vh"]{height:32vh !important}
-  /* крупные vw-заголовки не должны схлопываться на узком экране */
   [style*="4.6vw"]{font-size:26px !important}
   [style*="3.4vw"]{font-size:23px !important}
   [style*="3vw"]{font-size:22px !important}
   [style*="5.4vw"]{font-size:30px !important}
+  [data-plan-tabs]{overflow-x:auto !important;-webkit-overflow-scrolling:touch}
+  [data-plan-tab]{flex:0 0 auto !important}
+  [style*="display: flex; gap: 22px"]{flex-wrap:wrap !important}
+  [style*="border-right: 1px solid rgba(232, 237, 244, 0.16)"]{border-right:none !important}
 }
+@keyframes floatY{0%,100%{transform:translateY(-8px)}50%{transform:translateY(8px)}}
 </style>
 </helmet>
 
@@ -262,7 +262,7 @@ a:hover{color:#a9ccff}
   </div>
   <div style="max-width:760px;margin:0 auto">
     <!-- tabs -->
-    <div style="display:flex;align-items:flex-end">
+    <div data-plan-tabs="1" style="display:flex;align-items:flex-end">
       <div data-plan-tab="0" style="font:600 15px 'Manrope',sans-serif;padding:12px 22px;border:1px solid rgba(232,237,244,.25);border-bottom:none;border-radius:10px 10px 0 0;background:#10161f;cursor:pointer;display:flex;align-items:center;gap:8px;position:relative;z-index:2"><span data-plan-dot="0" style="width:7px;height:7px;border-radius:50%;background:#7fb8ff;display:inline-block"></span>Starter</div>
       <div data-plan-tab="1" style="font:600 15px 'Manrope',sans-serif;padding:12px 22px;border:1px solid rgba(232,237,244,.25);border-bottom:none;border-radius:10px 10px 0 0;background:#0a0d12;color:#8a94a6;cursor:pointer;display:flex;align-items:center;gap:8px;margin-left:-1px"><span data-plan-dot="1" style="width:7px;height:7px;border-radius:50%;background:transparent;display:inline-block"></span>Advanced</div>
       <div data-plan-tab="2" style="font:600 15px 'Manrope',sans-serif;padding:12px 22px;border:1px solid rgba(232,237,244,.25);border-bottom:none;border-radius:10px 10px 0 0;background:#0a0d12;color:#8a94a6;cursor:pointer;display:flex;align-items:center;gap:8px;margin-left:-1px"><span data-plan-dot="2" style="width:7px;height:7px;border-radius:50%;background:transparent;display:inline-block"></span>Pro</div>
@@ -310,7 +310,7 @@ a:hover{color:#a9ccff}
     </div>
     <div style="padding:26px 30px">
       <div style="font:600 15px 'Manrope',sans-serif;border-bottom:1px solid rgba(232,237,244,.16);padding-bottom:14px">Контакты</div>
-      <div style="font:400 14px/1.9 'Manrope',sans-serif;color:#8a94a6;padding-top:16px">support@3dgen.com<br>Адрес компании, рег. номер</div>
+      <div style="font:400 14px/1.9 'Manrope',sans-serif;color:#8a94a6;padding-top:16px"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="95e6e0e5e5fae7e1d5a6f1f2f0fbbbf6faf8">[email&#160;protected]</a><br>Адрес компании, рег. номер</div>
     </div>
   </div>
   <div style="display:flex;justify-content:space-between;align-items:center;gap:20px;max-width:1100px;margin:0 auto;padding:22px 30px;border-top:1px solid rgba(232,237,244,.16);flex-wrap:wrap">
@@ -327,7 +327,7 @@ a:hover{color:#a9ccff}
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script type="text/x-dc" data-dc-script>
 class Component extends DCLogic {
   componentDidMount() {
     const root = document;
